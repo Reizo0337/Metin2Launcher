@@ -1,0 +1,179 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(27, 40, 78);
+}
+
+.config-styles {
+    padding: 20px;
+    max-width: 100%;
+}
+
+.container-conf { 
+    display: flex;
+    justify-content: space-between;
+}
+
+.row-right {
+    color: #fff;
+    background-color: rgb(21, 31, 61, 1);
+    height: 100vh;
+    width: 300px;
+}
+
+.row-right .title{
+    font-weight: bold;
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    
+}
+
+.row-right .menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 100px;
+}
+
+.row-right .menu li {
+    list-style: none;
+}
+
+.row-right .menu li a:hover {
+    background-color: rgba(0, 0, 0, 0.24);
+    transition: background-color 0.3s ease-in-out;
+}
+
+.row-right .menu li a span {
+    display: inline-block;
+    transition: transform 0.3s ease-in-out;
+}
+
+.row-right .menu li a:hover span {
+    scale: 1.05;
+    transition: scale 0.3s ease-in-out;
+}
+.row-right .menu li a {
+    color: #fff;
+    display:block;
+    text-decoration: none;
+    padding: 15px;
+    width: 100%;
+}
+
+.row-left {
+    background-color: rgb(19, 23, 42, 1);
+    height: 100vh;
+    width: 100%;
+    color: #fff
+}
+
+.config-styles h2 {
+    font-size: 32px;
+}
+
+.config-styles select {
+    max-width: 400px;
+    padding: 12px 15px;
+    border-radius: 5px; 
+    background-color: #444;
+    color: #fff;
+    font-size: 14px;
+    border: 1px solid #555;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    margin-top:15px;
+    border-radius: 15px;
+}
+
+.config-styles select:hover {
+    background-color: #555;
+    border-color: #888;
+}
+
+.config-styles select:focus {
+    outline: none;
+    background-color: #666;
+    border-color: #aaa;
+}
+
+.config-styles select::selection {
+    background-color: #666;
+    color: #fff;
+}
+
+.config-styles select option {
+    background-color: #444;
+    color: #fff;
+    padding: 8px;
+}
+
+.config-styles select option:hover {
+    background-color: #555;
+}
+
+.config-styles label {
+    color:rgb(143, 142, 142)
+}
+
+.custom-file-input {
+    display: none; /* Oculta el input original */
+}
+
+.custom-file-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 400px;
+    padding: 6px 12px;
+    border-radius: 15px;
+    background-color: #444;
+    color: #fff;
+    font-size: 14px;
+    border: 1px solid #555;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.custom-file-label:hover {
+    background-color: #555;
+    border-color: #888;
+}
+
+.custom-file-label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.custom-file-label .icon {
+    /* background-color: #fff; */
+    background-image: url("../../img/locate.png");
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    color: #444;
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.save {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 30px;
+}
+.save button{
+    width: 100px;
+    background-color:rgb(8, 14, 44);
+}
+
+.save button:hover {
+    background-color: rgb(4, 8, 22);
+}

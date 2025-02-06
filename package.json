@@ -1,0 +1,32 @@
+{
+  "name": "gamelauncher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^34.0.2",
+    "electron-builder": "^25.1.8",
+    "standard": "^17.1.2"
+  },
+  "eslintConfig": {
+    "extends": "./node_modules/standard/eslintrc.json"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  },
+  "build": {
+    "productName": "GameLauncher",
+    "appId": "com.yourcompany.gamelauncher",
+    "win": {
+      "forceSymlinks": false
+    }
+  }
+}
