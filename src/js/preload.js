@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electron', {
   newsFetch: () => ipcRenderer.send('news-fetch'),
   onUpdateNews: (callback) => ipcRenderer.on('update-news', (_event, news) => callback(news)),
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
+  // newsThing
   sendNotification: (notTitle, message, callback) => {
     ipcRenderer.invoke('send-notification', notTitle, message)
       .then(() => {

@@ -10,19 +10,24 @@ const NEWS_URL = 'http://localhost/patcher/news.json'
 // for updater.js
 const SERVER_NAME = 'SAPPHIRE2'
 const SERVER_URL = 'http://localhost/patcher/'
-const UPLOADS_FOLDER = 'uploads/'
 const PATCH_LIST_URL = 'http://localhost/patcher/file_list.txt'
-const GAME_FOLDER = path.join(__dirname, 'patcher') // for testing purposes after change it to install_path
+const UPLOADS_FOLDER = 'uploads/'
 const DEFAULT_GAME_FOLDER = 'C:\\Program Files (x86)\\Sapphire2'
 const PATCHER_CONFIG_FILE = path.join(os.homedir(), 'AppData', 'Roaming', SERVER_NAME + '/dev/patch_config.json') // storing in %appdata%
+
+// testing
+const ENABLE_PARALLEL_DOWNLOADS = true
+const MAX_CONCURRENT_DOWNLOADS = 3 // it can be more if better internet connection **NOTE FOR REIZO** Should I check if user have good internet connection, and amply it auto?
+// testing 
 
 module.exports = {
   NEWS_URL,
   SERVER_URL,
   UPLOADS_FOLDER,
   PATCH_LIST_URL,
-  GAME_FOLDER,
   DEFAULT_GAME_FOLDER,
   PATCHER_CONFIG_FILE,
-  SERVER_NAME
+  SERVER_NAME,
+  ENABLE_PARALLEL_DOWNLOADS,
+  MAX_CONCURRENT_DOWNLOADS
 }

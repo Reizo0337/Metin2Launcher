@@ -1,8 +1,10 @@
 const { app, BrowserWindow, ipcMain, shell, Notification } = require('electron')
 const path = require('path')
-const { logInit } = require('./src/js/updater.js')
+const { logInit } = require('./src/js/workers/updater.js')
 const { fetchNews } = require('./src/js/news.js')
-const { checkOrInstallGame } = require('./src/js/installer.js')
+const { checkOrInstallGame } = require('./src/js/workers/installer.js')
+const { checkServerLoad } = require('./src/js/workers/serverChecker.js')
+const { SERVER_NAME } = require('./src/js/commonDefines.js')
 
 let win
 
@@ -13,7 +15,7 @@ function createWindow () {
     frame: false,
     resizable: false,
     icon: path.join(__dirname, 'img/metin2.ico'),
-    title: 'Reizo Game Launcher',
+    title: SERVER_NAME,
     fullscreen: false,
     process: false,
     webPreferences: {
@@ -47,23 +49,25 @@ app.on('activate', () => {
 })
 
 ipcMain.on('check-updates', (event) => {
-  console.log('Checking updates')
-
-  // checkOrInstallGame()
-
   const updateStatus = (message) => {
     console.log('Status:', message)
     event.reply('update-status', message)
   }
-
-  // Llamada a checkOrInstallGame con el callback
-  checkOrInstallGame(updateStatus)
-    .then(() => {
-      updateStatus('ok')
-    })
-    .catch((err) => {
-      updateStatus('Error: ' + err.message)
-    })
+  ( async () => {
+    const serverOK = await checkServerLoad()
+    if (!serverOK) {
+      updateStatus('Error: Server not responding')
+      // return
+    }
+    else {
+      console.log('serverOK')
+      checkOrInstallGame(updateStatus).then(() => {
+        updateStatus('ok')
+      }) .catch((err) => {
+        updateStatus('Error: ' + err.message)
+      })
+    }
+  })()
 })
 
 ipcMain.on('news-fetch', async (event) => {
