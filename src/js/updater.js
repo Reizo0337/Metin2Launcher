@@ -4,11 +4,11 @@ const http = require('http')
 const https = require('https')
 const crypto = require('crypto')
 
-const { SERVER_URL, UPLOADS_FOLDER, GAME_FOLDER, PATCH_LIST_URL } = require('./commonDefines.js')
+const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, PATCHER_CONFIG_FILE} = require('./commonDefines.js')
 
 function readPatcherConfig () {
   // open /dev/patch_config.json
-  const configPath = './src/js/dev/patch_config.json'
+  const configPath = PATCHER_CONFIG_FILE
   if (!fs.existsSync(configPath)) {
     console.error('Error: Cannot find /dev/patch_config.json')
     // process.exit(1)

@@ -1,32 +1,41 @@
 {
   "name": "gamelauncher",
   "version": "1.0.0",
-  "description": "",
+  "description": "Reizo Game Launcher",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Reizo",
   "license": "ISC",
   "devDependencies": {
+    "@electron-forge/maker-squirrel": "^7.6.1",
+    "@electron-forge/maker-zip": "^7.6.1",
     "electron": "^34.0.2",
     "electron-builder": "^25.1.8",
     "standard": "^17.1.2"
-  },
-  "eslintConfig": {
-    "extends": "./node_modules/standard/eslintrc.json"
   },
   "dependencies": {
     "bootstrap": "^5.3.3"
   },
   "build": {
-    "productName": "GameLauncher",
-    "appId": "com.yourcompany.gamelauncher",
+    "appId": "com.reizo.launcher",
+    "productName": "Reizo Game Launcher",
+    "copyright": "2023 Reizo",
+    "asar": true,
     "win": {
-      "forceSymlinks": false
-    }
+      "target": ["portable"]
+    },
+    "files": [
+      "**/*",
+      "!build",
+      "!dist",
+      "!out",
+      "!node_modules/@electron-builder"
+    ]
   }
 }

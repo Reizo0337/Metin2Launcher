@@ -1,5 +1,6 @@
 // comonDefines.js
 const path = require('path')
+const os = require('os')
 
 // REIZO GAME LAUNCHER V0.1
 
@@ -7,13 +8,13 @@ const path = require('path')
 const NEWS_URL = 'http://localhost/patcher/news.json'
 
 // for updater.js
+const SERVER_NAME = 'SAPPHIRE2'
 const SERVER_URL = 'http://localhost/patcher/'
 const UPLOADS_FOLDER = 'uploads/'
 const PATCH_LIST_URL = 'http://localhost/patcher/file_list.txt'
 const GAME_FOLDER = path.join(__dirname, 'patcher') // for testing purposes after change it to install_path
 const DEFAULT_GAME_FOLDER = 'C:\\Program Files (x86)\\Sapphire2'
-const PATCHER_CONFIG_FILE = path.join(__dirname, 'dev/patch_config.json')
-const SERVER_NAME = 'SAPPHIRE2'
+const PATCHER_CONFIG_FILE = path.join(os.homedir(), 'AppData', 'Roaming', SERVER_NAME + '/dev/patch_config.json') // storing in %appdata%
 
 module.exports = {
   NEWS_URL,

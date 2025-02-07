@@ -63,7 +63,7 @@ function isGameInstalled () {
   return fs.existsSync(path.join(GAME_FOLDER, 'metin2release.exe'))
 }
 
-async function checkOrInstallGame(updateCallback) {
+async function checkOrInstallGame (updateCallback) {
   updateCallback('Loading game path...')
   loadGamePath()
   console.log(GAME_FOLDER)
