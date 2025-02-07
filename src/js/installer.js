@@ -41,6 +41,13 @@ function saveGamePath (gamePath) {
 }
 
 async function selectGamePath () {
+  await dialog.showMessageBox({
+    type: 'info',
+    buttons: ['OK'],
+    title: SERVER_NAME + ' Folder Not Found',
+    message: 'The default ' + SERVER_NAME + ' folder could not be found. Please select the game folder manually.'
+  })
+
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
     title: 'Select ' + SERVER_NAME + ' Game Folder'
