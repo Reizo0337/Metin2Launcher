@@ -11,11 +11,17 @@ const SERVER_URL = 'http://localhost/patcher/'
 const UPLOADS_FOLDER = 'uploads/'
 const PATCH_LIST_URL = 'http://localhost/patcher/file_list.txt'
 const GAME_FOLDER = path.join(__dirname, 'patcher') // for testing purposes after change it to install_path
+const DEFAULT_GAME_FOLDER = 'C:\\Program Files (x86)\\Sapphire2'
+const PATCHER_CONFIG_FILE = path.join(__dirname, 'dev/patch_config.json')
+const SERVER_NAME = 'SAPPHIRE2'
 
 module.exports = {
   NEWS_URL,
   SERVER_URL,
   UPLOADS_FOLDER,
   PATCH_LIST_URL,
-  GAME_FOLDER
+  GAME_FOLDER,
+  DEFAULT_GAME_FOLDER,
+  PATCHER_CONFIG_FILE,
+  SERVER_NAME
 }

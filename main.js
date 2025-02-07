@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain, shell, Notification } = require('electron')
 const path = require('path')
-const { downloadPatchList, logInit } = require('./src/js/updater.js')
+const { logInit } = require('./src/js/updater.js')
 const { fetchNews } = require('./src/js/news.js')
+const { checkOrInstallGame } = require('./src/js/installer.js')
 
 let win
 
@@ -30,6 +31,8 @@ function createWindow () {
 }
 
 app.on('ready', createWindow)
+logInit()
+// loadConfig()
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -46,19 +49,20 @@ app.on('activate', () => {
 ipcMain.on('check-updates', (event) => {
   console.log('Checking updates')
 
+  // checkOrInstallGame()
+
   const updateStatus = (message) => {
     console.log('Status:', message)
     event.reply('update-status', message)
   }
 
-  // updateStatus('Starting update check...')
-
-  downloadPatchList(updateStatus)
+  // Llamada a checkOrInstallGame con el callback
+  checkOrInstallGame(updateStatus)
     .then(() => {
       updateStatus('ok')
     })
     .catch((err) => {
-      updateStatus('Failed to update: ' + err.message)
+      updateStatus('Error: ' + err.message)
     })
 })
 
@@ -89,5 +93,3 @@ ipcMain.handle('send-notification', (event, notTitle, message) => {
 ipcMain.handle('open-external', (event, url) => {
   shell.openExternal(url)
 })
-
-logInit()

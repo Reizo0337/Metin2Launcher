@@ -21,3 +21,4 @@ Attr:
 TODO:
 
 - Verify if the Launcher really download something. (Cause if the files are already uploaded, he will say Updated Succesfully and that's not really ok)
+- MultiLanguage support.
