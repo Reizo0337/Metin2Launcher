@@ -3,3 +3,4 @@ node_modules/
 dist/
 src/js/patcher/
 /src/js/dev
+src/js/dev/patch_config.json
