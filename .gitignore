@@ -2,3 +2,4 @@ package-lock.json
 node_modules/
 dist/
 src/js/patcher/
+/src/js/dev
