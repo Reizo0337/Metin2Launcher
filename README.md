@@ -29,3 +29,4 @@ TODO:
 IDEAS:
 
 - Chunking the files and downloading them by chunks, to let user restart the download if there's any problem with the internet or server. This will prevent of bad downloads. PARTIAL DOWNLOADS.
+- Add 2process updating. (while playing the game)

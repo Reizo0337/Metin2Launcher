@@ -50,6 +50,10 @@ function setupNewsClickListeners() {
   const news1Clickable = document.getElementById('news_1_url');
   const news2Clickable = document.getElementById('news_2_url');
 
+  // close-minimize buttons
+  const minimizeButton = document.getElementById('minimizeWindow')
+  const closeButton = document.getElementById('closeWindow')
+
   // listen for clicking config <a>
   const config = document.getElementById('switchConfig')
   if (config) {
@@ -68,6 +72,17 @@ function setupNewsClickListeners() {
   if (news2Clickable) {
     news2Clickable.addEventListener('click', (event) => {
       makeNewsClickable(news2Clickable)
+    })
+  }
+
+  if (minimizeButton) {
+    minimizeButton.addEventListener('click', () => {
+      window.electron.minimizeWindow()
+    })
+  }
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      window.electron.closeWindow()
     })
   }
 }

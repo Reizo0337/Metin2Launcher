@@ -16,5 +16,8 @@ contextBridge.exposeInMainWorld('electron', {
       .catch((error) => {
         console.error('Error sending notification:', error)
       })
-  }
+  },
+  // close / minimize thing
+  closeWindow: () => ipcRenderer.send('close'),
+  minimizeWindow: () => ipcRenderer.send('minimize')
 })
