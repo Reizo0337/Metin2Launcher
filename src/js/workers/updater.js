@@ -4,22 +4,19 @@ const http = require('http')
 const https = require('https')
 const crypto = require('crypto')
 
-const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, PATCHER_CONFIG_FILE, ENABLE_PARALLEL_DOWNLOADS , MAX_CONCURRENT_DOWNLOADS } = require('../commonDefines.js') 
-// const { readPatcherConfig } = require('./installer.js')
+const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, PATCHER_CONFIG_FILE, ENABLE_PARALLEL_DOWNLOADS , MAX_CONCURRENT_DOWNLOADS, PATCHER_PATH_LOG } = require('../commonDefines.js') 
+const { loadConfig } = require('./loadPatchConfig.js')
 
-function readPatcherConfig() {
-  const configPath = PATCHER_CONFIG_FILE
-  if (!fs.existsSync(configPath)) {
-    console.error('Error: Cannot find patch_config.json')
-    throw new Error('patch_config.json not found')
-  }
-  return JSON.parse(fs.readFileSync(configPath, 'utf8'))
+console.log(loadConfig())
+
+function getGameFolder() {
+  return loadConfig()
 }
 
 // Download a single file and report its status via updateCallback
 function downloadFile(patch, updateCallback) {
   return new Promise((resolve, reject) => {
-    const patchConfigFile = readPatcherConfig()
+    const patchConfigFile = getGameFolder()
     const filePath = path.join(patchConfigFile.gamePath, patch.filePath)
     const file = fs.createWriteStream(filePath)
     const protocol = SERVER_URL.startsWith('https') ? https : http
@@ -93,6 +90,7 @@ function parsePatchList(data) {
 
 // Check each file against the patch list and download if needed.
 async function checkFiles(patches, updateCallback) {
+
   if (ENABLE_PARALLEL_DOWNLOADS === true) {
     const downloadQueue = [...patches];
     const inProgress = [];
@@ -102,7 +100,7 @@ async function checkFiles(patches, updateCallback) {
 
       const patch = downloadQueue.shift();
       // check sums
-      const patchConfigFile = readPatcherConfig()
+      const patchConfigFile = getGameFolder()
       const localFilePath = path.join(patchConfigFile.gamePath, patch.filePath);
     
       const localFileHash = await getFileHash(localFilePath)
@@ -142,7 +140,7 @@ async function checkFiles(patches, updateCallback) {
     }
   } else {
     for (const patch of patches) {
-      const patchConfigFile = readPatcherConfig();
+      const patchConfigFile = getGameFolder();
       const localFilePath = path.join(patchConfigFile.gamePath, patch.filePath);
       const dirPath = path.dirname(localFilePath);
 
@@ -184,11 +182,10 @@ function getFileHash(filePath) {
 
 // log.txt file
 function logInit() {
-  const patchConfigFile = readPatcherConfig()
-  const logFile = path.join(patchConfigFile.gamePath, 'log.txt')
+  const logFile = PATCHER_PATH_LOG + "patch_log.txt"
 
-  if (!fs.existsSync(patchConfigFile.gamePath)) {
-    fs.mkdirSync(patchConfigFile.gamePath, { recursive: true })
+  if (!fs.existsSync(PATCHER_PATH_LOG)) {
+    fs.mkdirSync(PATCHER_PATH_LOG, { recursive: true })
   }
 
   fs.writeFileSync(logFile, '', { flag: 'w' })
@@ -198,9 +195,9 @@ function logInit() {
 
 // add log trace
 function TraceLog(message) {
-  const patchConfigFile = readPatcherConfig()
-  const logFile = path.join(patchConfigFile.gamePath, 'log.txt')
+  const patchConfigFile = getGameFolder()
+  const logFile = path.join(PATCHER_PATH_LOG, 'patch_log.txt')
   fs.appendFileSync(logFile, `${new Date().toISOString()}: ${message}\n`)
 }
 
-module.exports = { downloadPatchList, logInit }
+module.exports = { downloadPatchList, logInit, getGameFolder }

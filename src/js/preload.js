@@ -19,5 +19,8 @@ contextBridge.exposeInMainWorld('electron', {
   },
   // close / minimize thing
   closeWindow: () => ipcRenderer.send('close'),
-  minimizeWindow: () => ipcRenderer.send('minimize')
+  minimizeWindow: () => ipcRenderer.send('minimize'),
+  
+  // openGame
+  openGame: () => ipcRenderer.send('open-game')
 })

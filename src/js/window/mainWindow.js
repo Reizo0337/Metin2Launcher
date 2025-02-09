@@ -54,6 +54,17 @@ function setupNewsClickListeners() {
   const minimizeButton = document.getElementById('minimizeWindow')
   const closeButton = document.getElementById('closeWindow')
 
+  // playbutton
+  const playButton = document.getElementById('playButton')
+
+  if (playButton) {
+    playButton.addEventListener('click', () => {
+      hideWindows()
+      playButton.style.display = 'none'
+      window.electron.openGame()
+    })
+  }
+
   // listen for clicking config <a>
   const config = document.getElementById('switchConfig')
   if (config) {

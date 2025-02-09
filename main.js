@@ -2,31 +2,55 @@ const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImag
 const path = require('path')
 const { logInit } = require('./src/js/workers/updater.js')
 const { fetchNews } = require('./src/js/news.js')
-const { checkOrInstallGame } = require('./src/js/workers/installer.js')
+const { checkOrInstallGame, isFirstInstall} = require('./src/js/workers/installer.js')
 const { checkServerLoad } = require('./src/js/workers/serverChecker.js')
-const { SERVER_NAME } = require('./src/js/commonDefines.js')
+const { SERVER_NAME, GAME_EXE_NAME } = require('./src/js/commonDefines.js')
 
 let win
 let tray
 
-function createWindow () {
-  win = new BrowserWindow({
-    width: 1280,
-    height: 720,
-    frame: false,
-    resizable: false,
-    icon: path.join(__dirname, 'img/metin2.ico'),
-    title: SERVER_NAME,
-    fullscreen: false,
-    process: false,
-    webPreferences: {
-      preload: path.join(__dirname, 'src/js/preload.js'),
-      nodeIntegration: false,
-      contextIsolation: true
-    }
-  })
+let isFirstInstalling = isFirstInstall()
 
-  win.loadFile('src/run.html')
+function createWindow () {
+  if (!isFirstInstalling) { 
+    win = new BrowserWindow({
+      width: 300,
+      height: 400,
+      frame: false,
+      resizable: false,
+      icon: path.join(__dirname, 'img/metin2.ico'),
+      title: SERVER_NAME,
+      fullscreen: false,
+      allowfullscreen: false,
+      process: false,
+      webPreferences: {
+        preload: path.join(__dirname, 'src/js/preload.js'),
+        nodeIntegration: false,
+        contextIsolation: true
+      }
+    })
+
+    win.loadFile('src/install.html')
+  } else { // game already installed
+    win = new BrowserWindow({
+      width: 1280,
+      height: 720,
+      frame: false,
+      resizable: false,
+      icon: path.join(__dirname, 'img/metin2.ico'),
+      title: SERVER_NAME,
+      fullscreen: false,
+      process: false,
+      webPreferences: {
+        preload: path.join(__dirname, 'src/js/preload.js'),
+        nodeIntegration: false,
+        contextIsolation: true
+      }
+    })
+    
+    win.loadFile('src/run.html')
+  }
+
   trayIcon = nativeImage.createFromPath(path.join(__dirname, 'img/metin2.ico'))
   trayIcon = trayIcon.resize({ width: 16, height: 16 })
   
@@ -66,8 +90,8 @@ function createWindow () {
 }
 
 app.on('ready', createWindow)
+
 logInit()
-// loadConfig()
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -82,27 +106,27 @@ app.on('activate', () => {
 })
 
 // listeners
-ipcMain.on('check-updates', (event) => {
-  const updateStatus = (message) => {
-    console.log('Status:', message)
-    event.reply('update-status', message)
-  }
-  ( async () => {
-    const serverOK = await checkServerLoad()
-    if (!serverOK) {
-      updateStatus('Error: Server not responding')
-      // return
-    }
-    else {
-      console.log('serverOK')
-      checkOrInstallGame(updateStatus).then(() => {
-        updateStatus('ok')
-      }) .catch((err) => {
-        updateStatus('Error: ' + err.message)
-      })
-    }
-  })()
-})
+// ipcMain.on('check-updates', (event) => {
+//   const updateStatus = (message) => {
+//     console.log('Status:', message)
+//     event.reply('update-status', message)
+//   }
+//   ( async () => {
+//     const serverOK = await checkServerLoad()
+//     if (!serverOK) {
+//       updateStatus('Error: Server not responding')
+//       // return
+//     }
+//     else {
+//       console.log('serverOK')
+//       checkOrInstallGame(updateStatus).then(() => {
+//         updateStatus('ok')
+//       }) .catch((err) => {
+//         updateStatus('Error: ' + err.message)
+//       })
+//     }
+//   })()
+// })
 
 ipcMain.on('news-fetch', async (event) => {
   const updateNews = (message) => {
@@ -136,6 +160,14 @@ ipcMain.on('minimize', (event) => {
 ipcMain.on('close', (event) => {
   const window = event.sender.getOwnerBrowserWindow()
   if (window) window.close()
+})
+
+ipcMain.on('open-game', (event) => {
+  const window = event.sender.getOwnerBrowserWindow()
+  if (window) window.close()
+  let exeRoute = getGameFolder()
+  exeRoute = exeRoute.gamePath + '/' + GAME_EXE_NAME
+  shell.openPath(exeRoute)
 })
 
 ipcMain.handle('open-external', (event, url) => {

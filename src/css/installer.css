@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&display=swap');
+
+body { 
+  background-image: url('../../img/installer_bg.png');
+  margin: 0;
+  padding: 0;
+  font-family: "Oswald", serif;
+  font-style: normal;
+  user-select: none;
+}
+
+.primaryContainer {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.secondaryContainer {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 100%;
+  color: #fff;
+}
+
+.btn-install-game {
+  background: none;
+  border: none;
+  background-color: #282828;
+  padding:15px 15px;
+  width: 80%;
+  color: white;
+  box-shadow: 4px 10px 10px rgba(0, 0, 0, 0.4)
+}
+
+.btn-install-game:hover {
+  background-color: #232323;
+  /* cursor: pointer; */
+  transition: background-color 0.3s ease;
+  scale: 1.01;
+  transition: scale 0.2s ease;
+}
+
+.adv-opt {
+  background: none;
+  color: #e7e6e6;
+  border: none;
+  font-weight: bold;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.adv-opt:hover {
+  text-decoration: underline;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.serverName {
+  color: #e7e6e6;
+  text-shadow: 2px 2px 2px black;
+}

@@ -1,0 +1,141 @@
+.launch {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url("../../img/patcher_bg.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+.optButtons{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px, 20px;
+}
+header .appTitle {
+    font-size: 16px;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+rest {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+.Notice {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+.Info {
+    margin-left: 30px;
+    margin-bottom: 2.9vh;
+}
+
+.Info p {
+    word-wrap: break-word;
+    color: #fff;
+}
+rest .card { 
+    margin: 20px;
+    background-color: #212121a4;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    float: right;
+}
+
+.card:hover {
+    /* width: 210px; */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+    /* in-ease */
+}
+
+.config {
+    margin-top: 35px;
+    padding: 15px;
+    position:absolute;
+}
+
+.config a, .config button{
+    background: none;
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 10px 20px;
+    background-image: url("../../img/config.png");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    -webkit-app-region: no-drag;
+    background-color: rgba(167, 167, 167, 0.096);
+    border-radius: 3px;
+}
+
+#playButton {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  margin-bottom: -5px;
+  background-image: url("../../img/play_btn.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: center;
+  cursor: pointer;
+  width: 174px;
+  height: 63px;
+}
+
+#playButton:hover {
+    scale: 1.02;
+    transition: scale 0.3s ease-in-out;
+}
+
+.config a:hover {
+    background-color: rgba(167, 167, 167, 0.308);
+    transition: background-color 0.3s ease-in-out;
+}
+
+.news-desc {
+  width: 100%;
+  height: auto;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.learnMore {
+  font-weight: bold;
+  color: blue;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+#configWindow {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.5s ease, height 0.5s ease;
+}
+
+#configWindow.show {
+  opacity: 1;
+  height: auto; /* Transition to the actual height */
+}
