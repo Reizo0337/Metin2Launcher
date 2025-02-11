@@ -20,7 +20,8 @@
     "standard": "^17.1.2"
   },
   "dependencies": {
-    "bootstrap": "^5.3.3"
+    "bootstrap": "^5.3.3",
+    "unzipper": "^0.12.3"
   },
   "build": {
     "appId": "com.reizo.launcher",
@@ -28,7 +29,9 @@
     "copyright": "2023 Reizo",
     "asar": true,
     "win": {
-      "target": ["portable"]
+      "target": [
+        "portable"
+      ]
     },
     "files": [
       "**/*",

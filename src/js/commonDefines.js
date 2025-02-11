@@ -13,9 +13,13 @@ const GAME_EXE_NAME = 'Metin2Release.exe'
 const SERVER_URL = 'http://localhost/patcher/'
 const PATCH_LIST_URL = 'http://localhost/patcher/file_list.txt'
 const UPLOADS_FOLDER = 'uploads/'
-const DEFAULT_GAME_FOLDER = 'C:\\Program Files (x86)\\Sapphire2'
+const DEFAULT_GAME_FOLDER = path.join(os.homedir(), 'AppData', 'Roaming', SERVER_NAME)
 const PATCHER_PATH_LOG = path.join(os.homedir(), 'AppData', 'Roaming', SERVER_NAME + '/dev/')
 const PATCHER_CONFIG_FILE = path.join(os.homedir(), 'AppData', 'Roaming', SERVER_NAME + '/dev/patch_config.json') // storing in %appdata%
+
+// for installer.js
+const ZIP_NAME = SERVER_NAME + '.zip'
+const INSTALLER_URL = 'http://localhost/patcher/installation/' + ZIP_NAME
 
 // testing
 const ENABLE_PARALLEL_DOWNLOADS = true
@@ -33,5 +37,6 @@ module.exports = {
   ENABLE_PARALLEL_DOWNLOADS,
   MAX_CONCURRENT_DOWNLOADS,
   GAME_EXE_NAME,
-  PATCHER_PATH_LOG
+  PATCHER_PATH_LOG,
+  INSTALLER_URL
 }

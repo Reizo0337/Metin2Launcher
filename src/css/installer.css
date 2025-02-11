@@ -70,3 +70,14 @@ body {
   color: #e7e6e6;
   text-shadow: 2px 2px 2px black;
 }
+
+.advanced-options-container{
+  background-color: #23232367;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  height: 90vh;
+  color: #fff;
+}

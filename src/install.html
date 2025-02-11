@@ -28,19 +28,25 @@
         </div>
     </div>
     <div class="secondaryContainer" id="loadingContainer">
-      <div class="spinner-border text-primary" role="status">
-      </div>
-      <p>INSTALLING GAME</p>
+      <progress id="progress-bar" value="0" max="100"></progress>
+      <p id="progress-label">INSTALLING GAME</p>
     </div>
   </div>
   <div class="advanced-options-container" id="advanced-options-container">
-    <div class="advanced-options-header">
-      <h2>Advanced Options</h2>
-      <button class="close-advanced-options" id="close-advanced-options-btn">Close</button>
+    <p>Select Route to install:</p>
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" id="installPath" placeholder="No folder selected" readonly>
+      <button class="btn btn-primary" onclick="selectInstallPath()">Browse...</button>
     </div>
-    <div class="advanced-options-content">
-      <!-- Advanced options content here -->
+    
+
+    <p>Enable Shortcut?</p>
+    <div class="form-check form-switch">
+      <input type="checkbox" class="form-check-input" id="enableShortcut">
+      <label class="form-check-label" for="enableShortcut">Shortcut</label>
     </div>
+
+    <button class="btn btn-primary" id="saveButton" style="margin-top: 30px; padding: 5px 20px;">SAVE</button>
   </div>
 </body>
 </html>

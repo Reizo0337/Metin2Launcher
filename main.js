@@ -1,8 +1,8 @@
-const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImage} = require('electron')
+const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImage, dialog } = require('electron')
 const path = require('path')
 const { logInit } = require('./src/js/workers/updater.js')
 const { fetchNews } = require('./src/js/news.js')
-const { checkOrInstallGame, isFirstInstall} = require('./src/js/workers/installer.js')
+const { installGame, isFirstInstall} = require('./src/js/workers/installer.js')
 const { checkServerLoad } = require('./src/js/workers/serverChecker.js')
 const { SERVER_NAME, GAME_EXE_NAME } = require('./src/js/commonDefines.js')
 
@@ -87,6 +87,14 @@ function createWindow () {
   win.on('closed', () => {
     win = null
   })
+
+  ipcMain.on('update-progress', (event, percent) => {
+    win.webContents.send('progress', percent);
+  });
+
+  ipcMain.on('install-progress', (event, text) => {
+    win.webContents.send('instText', text);
+  });
 }
 
 app.on('ready', createWindow)
@@ -103,6 +111,16 @@ app.on('activate', () => {
   if (win === null) {
     createWindow()
   }
+})
+
+function relaunchAfterInstall () {
+  console.log('Installation complete, relauching app to updater...');
+  app.relaunch()
+  app.quit()
+}
+
+app.on('installation-complete', () => {
+  relaunchAfterInstall()
 })
 
 // listeners
@@ -172,5 +190,17 @@ ipcMain.on('open-game', (event) => {
 
 ipcMain.handle('open-external', (event, url) => {
   shell.openExternal(url)
+})
+
+ipcMain.handle('open-folder-dialog', async () => {
+  const { filePaths } = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  });
+  return filePaths[0] || null;
+});
+
+ipcMain.handle('install-game', (event, installationDirectory) => {
+  console.log('Recv install-game command on ' + installationDirectory)
+  installGame(installationDirectory)
 })
 // listeners
