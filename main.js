@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImage, dialog } = require('electron')
 const path = require('path')
-const { logInit } = require('./src/js/workers/updater.js')
+const { logInit, downloadPatchList } = require('./src/js/workers/updater.js')
 const { fetchNews } = require('./src/js/news.js')
 const { installGame, isFirstInstall} = require('./src/js/workers/installer.js')
 const { checkServerLoad } = require('./src/js/workers/serverChecker.js')
@@ -12,7 +12,7 @@ let tray
 let isFirstInstalling = isFirstInstall()
 
 function createWindow () {
-  if (!isFirstInstalling) { 
+  if (isFirstInstalling) { 
     win = new BrowserWindow({
       width: 300,
       height: 400,
@@ -49,6 +49,8 @@ function createWindow () {
     })
     
     win.loadFile('src/run.html')
+
+    downloadPatchList()
   }
 
   trayIcon = nativeImage.createFromPath(path.join(__dirname, 'img/metin2.ico'))
@@ -123,29 +125,6 @@ app.on('installation-complete', () => {
   relaunchAfterInstall()
 })
 
-// listeners
-// ipcMain.on('check-updates', (event) => {
-//   const updateStatus = (message) => {
-//     console.log('Status:', message)
-//     event.reply('update-status', message)
-//   }
-//   ( async () => {
-//     const serverOK = await checkServerLoad()
-//     if (!serverOK) {
-//       updateStatus('Error: Server not responding')
-//       // return
-//     }
-//     else {
-//       console.log('serverOK')
-//       checkOrInstallGame(updateStatus).then(() => {
-//         updateStatus('ok')
-//       }) .catch((err) => {
-//         updateStatus('Error: ' + err.message)
-//       })
-//     }
-//   })()
-// })
-
 ipcMain.on('news-fetch', async (event) => {
   const updateNews = (message) => {
     event.reply('update-news', message)
@@ -202,5 +181,31 @@ ipcMain.handle('open-folder-dialog', async () => {
 ipcMain.handle('install-game', (event, installationDirectory) => {
   console.log('Recv install-game command on ' + installationDirectory)
   installGame(installationDirectory)
+})
+
+ipcMain.on('check-updates', (event) => {
+  const updateStatus = (message) => {
+    console.log('Status:', message)
+    event.reply('update-status', message)
+  }
+
+  (async () => {
+    const serverOK = await checkServerLoad()
+    if (!serverOK) {
+      updateStatus('Server is not available..')
+      // maybe start game :?
+      return
+    }
+  })
+  console.log('Checking updates')
+  updateStatus('Starting update check...')
+
+  downloadPatchList(updateStatus)
+    .then(() => {
+      updateStatus('ok')
+    })
+    .catch((err) => {
+      updateStatus('Failed to update: ' + err.message)
+    })
 })
 // listeners

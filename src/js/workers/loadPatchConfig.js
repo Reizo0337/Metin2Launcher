@@ -6,19 +6,24 @@ let GAME_FOLDER = DEFAULT_GAME_FOLDER;
 
 function loadConfig() {
   // 4the moment only getting gamePath 'cause no need to stack nothing more.
-  try {
-    if (fs.existsSync(PATCHER_CONFIG_FILE)) {
-      return JSON.parse(fs.readFileSync(PATCHER_CONFIG_FILE, 'utf8'));
+  try{
+    if (!fs.existsSync(PATCHER_CONFIG_FILE)) {
+      return { gamePath: '' };
     }
-  } catch (error) {
-    console.error('Error reading config file:', error);
+    const configContent = fs.readFileSync(PATCHER_CONFIG_FILE, 'utf8').trim();
+    if (!configContent) {
+      return { gamePath: '' };
+    }
+    return JSON.parse(configContent);;
   }
-  return { gamePath: '' };
+  catch (error) {
+    return { gamePath: '' };
+  }
 }
 
 function getGameFolder() {
   const config = loadConfig();
-  return config.gamePath || GAME_FOLDER;
+  return config.gamePath;
 }
 
 module.exports = { getGameFolder, loadConfig };

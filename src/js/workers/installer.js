@@ -7,32 +7,46 @@ const { dialog, ipcMain, app } = require('electron')
 const http = require('http')
 const https = require('https')
 
-let GAME_FOLDER = DEFAULT_GAME_FOLDER
-
-function isGameInstalled() {
-  return fs.existsSync(path.join(GAME_FOLDER, 'metin2release.exe'))
+function isGameInstalled(gamePath) {
+  return fs.existsSync(path.join(gamePath, 'metin2release.exe'))
 }
 
 function isFirstInstall() {
-  // check if already installed
-  return!isGameInstalled() && fs.existsSync(PATCHER_CONFIG_FILE)
-}
-
-function createPatchConfig() {
-  // create patch config file a txt.
-  const config = {
-    gamePath: route
+  if (!fs.existsSync(PATCHER_CONFIG_FILE)) {
+    return true;
   }
 
-  configContent = `gamePath=${config.gamePath}`;
-  
-  fs.writeFile(PATCHER_CONFIG_FILE, configContent, (err) => {
-    if (err) {
-      console.error('Error creating config file:', err);
-    } else {
-      console.log('Patch config file created successfully.');
+  try {
+    const config = loadConfig();
+    if (!config.gamePath === '') {
+      return true;
     }
-  })
+
+    if (!config.gamePath || !fs.existsSync(config.gamePath) || !isGameInstalled(config.gamePath)) {
+      return true;
+    }
+
+  } catch (error) {
+    return true;
+  }
+
+  return false;
+}
+
+function createPatchConfig(gamePath) {
+  const config = { gamePath };
+
+  try {
+    const dir = path.dirname(PATCHER_CONFIG_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(PATCHER_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+    console.log('Patcher config file created successfully:', PATCHER_CONFIG_FILE);
+  } catch (error) {
+    console.error('Error writing config file:', error);
+  }
 }
 
 function checkFolderForInstall(route) {
@@ -99,6 +113,7 @@ function unzipInstallation(routetofile) {
   readStream
     .pipe(unzipper.Extract({ path: routetofile }))
     .on('close', () => {
+      createPatchConfig(routetofile);
       console.log('Game unzipped successfully.');
       ipcMain.emit('update-progress', 0, 100)
       ipcMain.emit('install-progress', 0, 'Game successfully installed..')

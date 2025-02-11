@@ -9,6 +9,10 @@ body {
   user-select: none;
 }
 
+header {
+  flex-direction: row-reverse;
+}
+
 .primaryContainer {
   position: fixed;
   bottom: 0;

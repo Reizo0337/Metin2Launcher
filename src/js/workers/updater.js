@@ -4,19 +4,14 @@ const http = require('http')
 const https = require('https')
 const crypto = require('crypto')
 
-const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, PATCHER_CONFIG_FILE, ENABLE_PARALLEL_DOWNLOADS , MAX_CONCURRENT_DOWNLOADS, PATCHER_PATH_LOG } = require('../commonDefines.js') 
+const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, ENABLE_PARALLEL_DOWNLOADS , MAX_CONCURRENT_DOWNLOADS, PATCHER_PATH_LOG } = require('../commonDefines.js') 
 const { loadConfig } = require('./loadPatchConfig.js')
 
-console.log(loadConfig())
-
-function getGameFolder() {
-  return loadConfig()
-}
+const patchConfigFile = loadConfig()
 
 // Download a single file and report its status via updateCallback
-function downloadFile(patch, updateCallback) {
+function downloadFile(patch) {
   return new Promise((resolve, reject) => {
-    const patchConfigFile = getGameFolder()
     const filePath = path.join(patchConfigFile.gamePath, patch.filePath)
     const file = fs.createWriteStream(filePath)
     const protocol = SERVER_URL.startsWith('https') ? https : http
@@ -100,14 +95,12 @@ async function checkFiles(patches, updateCallback) {
 
       const patch = downloadQueue.shift();
       // check sums
-      const patchConfigFile = getGameFolder()
       const localFilePath = path.join(patchConfigFile.gamePath, patch.filePath);
     
       const localFileHash = await getFileHash(localFilePath)
 
       if (fs.existsSync(localFilePath) && localFileHash === patch.hash) {
         TraceLog(`Skipping ${patch.filePath} (already up to date)`);
-        // await downloadNext(); // next download  -- 07/2 commented innecesary.
         return;
       }
       const downloadPromise = downloadFile(patch, updateCallback)
@@ -140,7 +133,6 @@ async function checkFiles(patches, updateCallback) {
     }
   } else {
     for (const patch of patches) {
-      const patchConfigFile = getGameFolder();
       const localFilePath = path.join(patchConfigFile.gamePath, patch.filePath);
       const dirPath = path.dirname(localFilePath);
 
@@ -195,9 +187,8 @@ function logInit() {
 
 // add log trace
 function TraceLog(message) {
-  const patchConfigFile = getGameFolder()
   const logFile = path.join(PATCHER_PATH_LOG, 'patch_log.txt')
   fs.appendFileSync(logFile, `${new Date().toISOString()}: ${message}\n`)
 }
 
-module.exports = { downloadPatchList, logInit, getGameFolder }
+module.exports = { downloadPatchList, logInit }

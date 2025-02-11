@@ -7,6 +7,10 @@ const os = require('os')
 // for news.js
 const NEWS_URL = 'http://localhost/patcher/news.json'
 
+// for serverChecker.js
+const MAX_NUMBER_OF_RETRIES = 3
+const TIME_BETWEEN_RETRIES = 30000 // 30 seconds
+
 // for updater.js
 const SERVER_NAME = 'SAPPHIRE2'
 const GAME_EXE_NAME = 'Metin2Release.exe'
