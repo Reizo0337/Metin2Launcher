@@ -4,6 +4,9 @@ This launcher is made by Reizo#0337.
 Dependencies:
 - standard
 - nodejs
+- eslint
+- react
+- unzipper
 - electron
 - bootstrap
 - vscode/any other editor.
@@ -30,3 +33,4 @@ IDEAS:
 
 - Chunking the files and downloading them by chunks, to let user restart the download if there's any problem with the internet or server. This will prevent of bad downloads. PARTIAL DOWNLOADS.
 - Add 2process updating. (while playing the game)
+- Add userConfigFile.json to the server, for admins purposes.
