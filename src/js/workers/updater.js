@@ -60,12 +60,10 @@ function downloadPatchList(updateCallback) {
           await checkFiles(patches, updateCallback)
           resolve()
         } catch (err) {
-          updateCallback(`Error processing patch list: ${err.message}`)
           reject(err)
         }
       })
     }).on('error', (err) => {
-      updateCallback('Request error: ' + err.message)
       reject(err)
     })
   })
@@ -108,8 +106,6 @@ async function checkFiles(patches, updateCallback) {
       inProgress.push(downloadPromise);
       try {
         await downloadPromise;
-      } catch (e) {
-        updateCallback(`Error downloading ${patch.filePath}: ${e.message}`);
       } finally {
         inProgress.splice(inProgress.indexOf(downloadPromise), 1);
       }

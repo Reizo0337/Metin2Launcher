@@ -183,29 +183,43 @@ ipcMain.handle('install-game', (event, installationDirectory) => {
   installGame(installationDirectory)
 })
 
+process.on('unhandledRejection', (err, promise) => {
+	console.error("Unhandled Rejection at:", promise, "reason:", err);
+	// Optional: You can exit the process if needed
+	// process.exit(1);
+  });
+
 ipcMain.on('check-updates', (event) => {
   const updateStatus = (message) => {
     console.log('Status:', message)
     event.reply('update-status', message)
   }
 
+  // fixed callUpdates and CheckServerLoad -- 20/02/2025 -- There was a little bug. 
   (async () => {
-    const serverOK = await checkServerLoad()
-    if (!serverOK) {
-      updateStatus('Server is not available..')
-      // maybe start game :?
-      return
-    }
-  })
-  console.log('Checking updates')
-  updateStatus('Starting update check...')
+	try {
+		const serverOK = await checkServerLoad();
+		if (!serverOK) {
+			updateStatus("Server is not available..");
+			return;
+		}
+	} catch (err) {
+		console.error("Error during server check:", err.message);
+		updateStatus("Error checking server status");
+		return;
+	}
 
-  downloadPatchList(updateStatus)
-    .then(() => {
-      updateStatus('ok')
-    })
-    .catch((err) => {
-      updateStatus('Failed to update: ' + err.message)
-    })
+	console.log("Checking updates...");
+	updateStatus("Starting update check...");
+
+	try {
+		await downloadPatchList(updateStatus);
+		updateStatus("ok");
+	} catch (err) {
+		console.error("Failed to fetch updates:", err.message);
+		updateStatus("Failed to update.");
+	}
+})();
+
 })
 // listeners
