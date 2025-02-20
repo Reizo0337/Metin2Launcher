@@ -1,4 +1,4 @@
-const { DEFAULT_GAME_FOLDER, PATCHER_CONFIG_FILE, INSTALLER_URL } = require('../commonDefines.js')
+const { DEFAULT_GAME_FOLDER, PATCHER_CONFIG_FILE, INSTALLER_URL, GAME_EXE_NAME} = require('../commonDefines.js')
 const { loadConfig } = require('./loadPatchConfig.js')
 const unzipper = require('unzipper');
 const fs = require('fs')
@@ -51,10 +51,13 @@ function checkFolderForInstall(route) {
   return new Promise((resolve) => {
     if (!fs.existsSync(route)) {
       fs.mkdirSync(route);  // Create the folder
-      resolve(true);
-    } else {
       resolve(false);
+    } 
+		else if (fs.existsSync(route + '/' + GAME_EXE_NAME))
+		{
+			resolve(true);  // Game is already installed
     }
+		resolve(false)
   });
 }
 
@@ -63,8 +66,9 @@ function installGame(route, overwrite = false) {
     route = DEFAULT_GAME_FOLDER;
   }
 
-  checkFolderForInstall(route).then((folderCreated) => {
-    if (folderCreated) {
+  checkFolderForInstall(route)
+	.then((folderCreated) => {
+    if (!folderCreated) {
       console.log(`Game folder created at ${route}. Installing game.`);
       fetchGame(route);
     } else {
@@ -72,7 +76,7 @@ function installGame(route, overwrite = false) {
       dialog.showMessageBox({
         type: 'warning',
         title: 'Warning',
-        message: `Game folder already exists at ${route}.\nDo you want to replace it with the default game folder?`,
+        message: `Game executable already exists at ${route}.\nDo you want to replace it?`,
         buttons: ['Yes', 'No']
       }).then(result => {
         if (result.response === 0) {  // User clicked "Yes"
@@ -131,10 +135,10 @@ function unzipInstallation(routetofile) {
     });
 }
 
-function fetchGame(route) {
+function fetchGame(unzipRoute) { // UPDATE 20/02/2025, fetching game in static route.. and created unzipRoute var..
   // Fetch game from the server and save it to the specified folder
   return new Promise((resolve, reject) => {
-   
+		route = DEFAULT_GAME_FOLDER
     console.log('Fetching game from server to route:', route);
     fileName = '/tempMetin2.zip'
     const file = fs.createWriteStream(route+fileName)
@@ -164,7 +168,7 @@ function fetchGame(route) {
         file.close()
         console.log('Game downloaded successfully.')
         // Unzip the downloaded file
-        unzipInstallation(route)
+        unzipInstallation(unzipRoute)
         resolve()
       })
 

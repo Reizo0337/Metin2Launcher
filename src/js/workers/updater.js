@@ -4,7 +4,7 @@ const http = require('http')
 const https = require('https')
 const crypto = require('crypto')
 
-const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, ENABLE_PARALLEL_DOWNLOADS , MAX_CONCURRENT_DOWNLOADS, PATCHER_PATH_LOG } = require('../commonDefines.js') 
+const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, ENABLE_PARALLEL_DOWNLOADS , MAX_CONCURRENT_DOWNLOADS, PATCHER_PATH_LOG, GAME_EXE_NAME } = require('../commonDefines.js') 
 const { loadConfig } = require('./loadPatchConfig.js')
 const { config } = require('process')
 
@@ -45,7 +45,7 @@ function downloadPatchList(updateCallback) {
 	return new Promise((resolve, reject) => {
 		patchConfigFile = loadConfig()
 		
-		if (!fs.existsSync(patchConfigFile.gamePath)) {
+		if (!fs.existsSync(patchConfigFile.gamePath) && !fs.existsSync(patchConfigFile.gamePath + '/' + GAME_EXE_NAME)) {
 			// game path isn't avaible.
 			console.log('GAME_PATH_NOT_FOUND' + patchConfigFile.gamePath)
 			reject(new Error('INVALID_GAME_PATH'))

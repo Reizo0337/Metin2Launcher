@@ -59,8 +59,6 @@ function setupNewsClickListeners() {
 
   if (playButton) {
     playButton.addEventListener('click', () => {
-      hideWindows()
-      playButton.style.display = 'none'
       window.electron.openGame()
     })
   }

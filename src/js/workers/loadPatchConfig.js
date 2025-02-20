@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { DEFAULT_GAME_FOLDER, PATCHER_CONFIG_FILE } = require('../commonDefines.js');
+const { PATCHER_CONFIG_FILE } = require('../commonDefines.js');
 
 function loadConfig() {
   // 4the moment only getting gamePath 'cause no need to stack nothing more.

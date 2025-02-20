@@ -49,37 +49,37 @@ function createWindow () {
         contextIsolation: true
       }
     })
+
+		trayIcon = nativeImage.createFromPath(path.join(__dirname, 'img/metin2.ico'))
+		trayIcon = trayIcon.resize({ width: 16, height: 16 })
+		
+		// working on tray
+		tray = new Tray(path.join(__dirname, 'img/metin2.ico'))
+		const contextMenu = Menu.buildFromTemplate([
+			{ icon: trayIcon, label: SERVER_NAME, enabled: false},
+			{ type: 'separator' },
+			{ label: 'Check for Updates', click: () => { checkUpdates() } },
+			{ label: 'Open App', click: () => { win.show() } },
+			{ type: 'separator' },
+			{ label: 'Website', click: () => {openWebsite()}},
+			{ label: 'Discord', click: () => {openDiscord()}},
+			{ type: 'separator' },
+			{ label: 'Quit', click: () => { 
+					tray.destroy() 
+					app.quit() 
+				} 
+			}
+		])
+		tray.setToolTip(SERVER_NAME + ' Launcher')
+		tray.setContextMenu(contextMenu)
+
+		tray.on('click', () => {
+			win.show()
+		})
     
     win.loadFile('src/run.html')
   }
 
-  trayIcon = nativeImage.createFromPath(path.join(__dirname, 'img/metin2.ico'))
-  trayIcon = trayIcon.resize({ width: 16, height: 16 })
-  
-  // working on tray
-  tray = new Tray(path.join(__dirname, 'img/metin2.ico'))
-  const contextMenu = Menu.buildFromTemplate([
-    { icon: trayIcon, label: SERVER_NAME, enabled: false},
-    { type: 'separator' },
-    { label: 'Check for Updates', click: () => { checkUpdates() } },
-    { label: 'Open App', click: () => { win.show() } },
-    { type: 'separator' },
-    { label: 'Website', click: () => {openWebsite()}},
-    { label: 'Discord', click: () => {openDiscord()}},
-    { type: 'separator' },
-    { label: 'Quit', click: () => { 
-        tray.destroy() 
-        app.quit() 
-      } 
-    }
-  ])
-  tray.setToolTip(SERVER_NAME + ' Launcher')
-  tray.setContextMenu(contextMenu)
-
-  tray.on('click', () => {
-    win.show()
-  })
-  
   win.on('close', (event) => {
     event.preventDefault()
     win.hide()
@@ -162,8 +162,8 @@ ipcMain.on('close', (event) => {
 ipcMain.on('open-game', (event) => {
   const window = event.sender.getOwnerBrowserWindow()
   if (window) window.close()
-  let exeRoute = getGameFolder()
-  exeRoute = exeRoute.gamePath + '/' + GAME_EXE_NAME
+  let configFile = loadConfig()
+  exeRoute = configFile.gamePath + '/' + GAME_EXE_NAME
   shell.openPath(exeRoute)
 })
 
@@ -187,7 +187,7 @@ process.on('unhandledRejection', (err, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", err);
 	// Optional: You can exit the process if needed
 	// process.exit(1);
-  });
+});
 
 ipcMain.on('check-updates', (event) => {
   const updateStatus = (message) => {
@@ -228,8 +228,12 @@ async function startUpdating() {
 		if (err.message === "INVALID_GAME_PATH") {
 			// set the new game path or get the option to install again.
 			try {
-				await selectNewGamePath()
-				startUpdating()
+				if (await selectNewGamePath() === true){
+					startUpdating()
+				}
+				else {
+					updateStatus("Game path not found. Please install the game again.");
+				}
 			} catch (err) {
 				console.error("Failed to select new game path:", err.message);
         updateStatus("Error selecting new game path.");
@@ -247,9 +251,9 @@ function selectNewGamePath() {
 	// create a dialog to select the new game path
 	response = dialog.showMessageBoxSync({
 		type: 'warning',
-    title: "Select new game path",
-    message: "Your game path is incorrect. Please select a new one..",
-    buttons: ["Ok"],
+    title: `Unanle find the ${SERVER_NAME} path..`,
+    message: "Unable to access the Game Path..\nPlease select a new one.. Or you can also install again the game..",
+    buttons: ["Select Path", "Install Again"],
 		defaultId: 0,
 		cancelId: 0
 	})
@@ -263,20 +267,27 @@ function selectNewGamePath() {
 		if (newGamePath && newGamePath.length > 0) {
 			selectedPath = newGamePath[0]
 			// check the path if is correct update game again if not tell the user again to select it.
-			if (fs.existsSync(selectedPath) && fs.existsSync(path.join(selectedPath, '/metin2release.exe'))) {
+			if (fs.existsSync(selectedPath) && fs.existsSync(path.join(selectedPath, '/' + GAME_EXE_NAME))) {
 				console.log("Path is correct")
 				// modify patch config json gamePath
 				config = { gamePath : loadConfig() }
 				config.gamePath = selectedPath
         fs.writeFileSync(PATCHER_CONFIG_FILE, JSON.stringify(config, null, 2))
 
-        return;
+        return true;
 			}
 			else{
 				console.log("Path is incorrect")
-        selectNewGamePath()
+				selectNewGamePath()
+				return false;
 			}
 		}
+	}
+	else if (response === 1){
+		// start installer just delete patcher_config_file and restart app..
+		fs.unlinkSync(PATCHER_CONFIG_FILE)
+		app.relaunch()
+		app.exit()
 	}
 }
 
