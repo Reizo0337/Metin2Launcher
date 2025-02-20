@@ -6,12 +6,12 @@ const crypto = require('crypto')
 
 const { SERVER_URL, UPLOADS_FOLDER, PATCH_LIST_URL, ENABLE_PARALLEL_DOWNLOADS , MAX_CONCURRENT_DOWNLOADS, PATCHER_PATH_LOG } = require('../commonDefines.js') 
 const { loadConfig } = require('./loadPatchConfig.js')
-
-const patchConfigFile = loadConfig()
+const { config } = require('process')
 
 // Download a single file and report its status via updateCallback
 function downloadFile(patch) {
   return new Promise((resolve, reject) => {
+		patchConfigFile = loadConfig()
     const filePath = path.join(patchConfigFile.gamePath, patch.filePath)
     const file = fs.createWriteStream(filePath)
     const protocol = SERVER_URL.startsWith('https') ? https : http
@@ -42,31 +42,39 @@ function downloadFile(patch) {
 
 // Download the patch list, then check and update files.
 function downloadPatchList(updateCallback) {
-  return new Promise((resolve, reject) => {
-    const protocol = SERVER_URL.startsWith('https') ? https : http
-    let data = ''
+	return new Promise((resolve, reject) => {
+		patchConfigFile = loadConfig()
+		
+		if (!fs.existsSync(patchConfigFile.gamePath)) {
+			// game path isn't avaible.
+			console.log('GAME_PATH_NOT_FOUND' + patchConfigFile.gamePath)
+			reject(new Error('INVALID_GAME_PATH'))
+      return
+		}
+		const protocol = SERVER_URL.startsWith('https') ? https : http
+		let data = ''
 
-    protocol.get(PATCH_LIST_URL, (response) => {
-      response.on('data', (chunk) => {
-        data += chunk
-      })
+		protocol.get(PATCH_LIST_URL, (response) => {
+			response.on('data', (chunk) => {
+				data += chunk
+			})
 
-      response.on('end', async () => {
-        try {
-          const patches = parsePatchList(data)
-          if (patches.length === 0) {
-            throw new Error('Patch list is empty')
-          }
-          await checkFiles(patches, updateCallback)
-          resolve()
-        } catch (err) {
-          reject(err)
-        }
-      })
-    }).on('error', (err) => {
-      reject(err)
-    })
-  })
+			response.on('end', async () => {
+				try {
+					const patches = parsePatchList(data)
+					if (patches.length === 0) {
+						throw new Error('Patch list is empty')
+					}
+					await checkFiles(patches, updateCallback)
+					resolve()
+				} catch (err) {
+					reject(err)
+				}
+			})
+		}).on('error', (err) => {
+			reject(err)
+		})
+	})
 }
 
 // Parse the patch list into objects with filePath and hash.
@@ -83,6 +91,8 @@ function parsePatchList(data) {
 
 // Check each file against the patch list and download if needed.
 async function checkFiles(patches, updateCallback) {
+	// first check if the file exists
+	patchConfigFile = loadConfig()
 
   if (ENABLE_PARALLEL_DOWNLOADS === true) {
     const downloadQueue = [...patches];

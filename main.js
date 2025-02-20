@@ -1,10 +1,12 @@
-const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImage, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImage, dialog, ipcRenderer } = require('electron')
 const path = require('path')
 const { logInit, downloadPatchList } = require('./src/js/workers/updater.js')
 const { fetchNews } = require('./src/js/news.js')
 const { installGame, isFirstInstall} = require('./src/js/workers/installer.js')
 const { checkServerLoad } = require('./src/js/workers/serverChecker.js')
-const { SERVER_NAME, GAME_EXE_NAME } = require('./src/js/commonDefines.js')
+const { SERVER_NAME, GAME_EXE_NAME, PATCHER_CONFIG_FILE } = require('./src/js/commonDefines.js')
+const { loadConfig } = require('./src/js/workers/loadPatchConfig.js')
+const fs = require('fs')
 
 let win
 let tray
@@ -49,8 +51,6 @@ function createWindow () {
     })
     
     win.loadFile('src/run.html')
-
-    downloadPatchList()
   }
 
   trayIcon = nativeImage.createFromPath(path.join(__dirname, 'img/metin2.ico'))
@@ -212,14 +212,73 @@ ipcMain.on('check-updates', (event) => {
 	console.log("Checking updates...");
 	updateStatus("Starting update check...");
 
+	startUpdating()
+})();
+
+async function startUpdating() {
+	const updateStatus = (message) => {
+    console.log('Status:', message)
+    event.reply('update-status', message)
+  }
+
 	try {
-		await downloadPatchList(updateStatus);
+		await downloadPatchList(updateStatus)
 		updateStatus("ok");
 	} catch (err) {
-		console.error("Failed to fetch updates:", err.message);
-		updateStatus("Failed to update.");
+		if (err.message === "INVALID_GAME_PATH") {
+			// set the new game path or get the option to install again.
+			try {
+				await selectNewGamePath()
+				startUpdating()
+			} catch (err) {
+				console.error("Failed to select new game path:", err.message);
+        updateStatus("Error selecting new game path.");
+        return;
+			}
+			
+		}
+		else{
+			console.error("Failed to fetch updates:", err.message);
+			updateStatus("Failed to update.");
+		}
 	}
-})();
+}
+function selectNewGamePath() {
+	// create a dialog to select the new game path
+	response = dialog.showMessageBoxSync({
+		type: 'warning',
+    title: "Select new game path",
+    message: "Your game path is incorrect. Please select a new one..",
+    buttons: ["Ok"],
+		defaultId: 0,
+		cancelId: 0
+	})
+
+	if (response === 0){
+		newGamePath = dialog.showOpenDialogSync({
+			title: "Select the Game Path",
+			properties: ["openDirectory"],
+		})
+
+		if (newGamePath && newGamePath.length > 0) {
+			selectedPath = newGamePath[0]
+			// check the path if is correct update game again if not tell the user again to select it.
+			if (fs.existsSync(selectedPath) && fs.existsSync(path.join(selectedPath, '/metin2release.exe'))) {
+				console.log("Path is correct")
+				// modify patch config json gamePath
+				config = { gamePath : loadConfig() }
+				config.gamePath = selectedPath
+        fs.writeFileSync(PATCHER_CONFIG_FILE, JSON.stringify(config, null, 2))
+
+        return;
+			}
+			else{
+				console.log("Path is incorrect")
+        selectNewGamePath()
+			}
+		}
+	}
+}
 
 })
 // listeners

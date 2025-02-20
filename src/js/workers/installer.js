@@ -13,19 +13,17 @@ function isGameInstalled(gamePath) {
 
 function isFirstInstall() {
   if (!fs.existsSync(PATCHER_CONFIG_FILE)) {
+	console.log('Didnt find patch configuration file')
     return true;
   }
 
   try {
     const config = loadConfig();
-    if (!config.gamePath === '') {
-      return true;
-    }
-
     if (!config.gamePath || !fs.existsSync(config.gamePath) || !isGameInstalled(config.gamePath)) {
-      return true;
+		// if gamePath is empty, then it means that it was installed so ask user if it exists to ubicate it.
+		console.log('Could not find game, but alreaady installed cause I found config file')
+		return false;
     }
-
   } catch (error) {
     return true;
   }
@@ -50,7 +48,7 @@ function createPatchConfig(gamePath) {
 }
 
 function checkFolderForInstall(route) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (!fs.existsSync(route)) {
       fs.mkdirSync(route);  // Create the folder
       resolve(true);
