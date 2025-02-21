@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImage, dialog, ipcRenderer } = require('electron')
+const { app, BrowserWindow, ipcMain, shell, Notification, Tray, Menu, nativeImage, dialog } = require('electron')
 const path = require('path')
 const { logInit, downloadPatchList } = require('./src/js/workers/updater.js')
 const { fetchNews } = require('./src/js/news.js')
@@ -12,6 +12,10 @@ let win
 let tray
 
 let isFirstInstalling = isFirstInstall()
+
+
+if (require('electron-squirrel-startup')) app.quit();
+
 
 function createWindow () {
   if (isFirstInstalling) { 
@@ -66,7 +70,7 @@ function createWindow () {
 			{ type: 'separator' },
 			{ label: 'Quit', click: () => { 
 					tray.destroy() 
-					app.quit() 
+					app.exit();
 				} 
 			}
 		])
@@ -76,6 +80,24 @@ function createWindow () {
 		tray.on('click', () => {
 			win.show()
 		})
+
+		win.webContents.on('did-finish-load', () => {
+			// Check if the necessary resources are ready
+			// (For example, check if all images have been loaded)
+			if (isResourcesLoaded()) {
+        win.show();
+      } else {
+				// timeout for 10sec.
+				setTimeout(() => {
+					if (!isResourcesLoaded()) {
+						win.close()
+					}
+				}, 10000)
+			}
+      
+      // Once the resources are fully loaded, show the window
+      win.show();
+		});
     
     win.loadFile('src/run.html')
   }
@@ -105,25 +127,20 @@ logInit()
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.exit();
   }
 })
-
-app.on('activate', () => {
-  if (win === null) {
-    createWindow()
-  }
-})
-
-function relaunchAfterInstall () {
-  console.log('Installation complete, relauching app to updater...');
-  app.relaunch()
-  app.quit()
-}
 
 app.on('installation-complete', () => {
   relaunchAfterInstall()
 })
+
+app.on('before-quit', () => {
+  if (tray) {
+    tray.destroy(); // Make sure tray is destroyed before quitting
+  }
+  console.log('Application is quitting...');
+});
 
 ipcMain.on('news-fetch', async (event) => {
   const updateNews = (message) => {
@@ -212,11 +229,12 @@ ipcMain.on('check-updates', (event) => {
 	console.log("Checking updates...");
 	updateStatus("Starting update check...");
 
-	startUpdating()
+	startUpdating(event)
 })();
+})
 
-async function startUpdating() {
-	const updateStatus = (message) => {
+async function startUpdating(event) {
+	updateStatus = (message) => {
     console.log('Status:', message)
     event.reply('update-status', message)
   }
@@ -229,7 +247,7 @@ async function startUpdating() {
 			// set the new game path or get the option to install again.
 			try {
 				if (await selectNewGamePath() === true){
-					startUpdating()
+					startUpdating(event)
 				}
 				else {
 					updateStatus("Game path not found. Please install the game again.");
@@ -247,6 +265,7 @@ async function startUpdating() {
 		}
 	}
 }
+
 function selectNewGamePath() {
 	// create a dialog to select the new game path
 	response = dialog.showMessageBoxSync({
@@ -288,8 +307,12 @@ function selectNewGamePath() {
 		fs.unlinkSync(PATCHER_CONFIG_FILE)
 		app.relaunch()
 		app.exit()
+		return false;
 	}
 }
 
-})
+function isResourcesLoaded(){
+	// load resources
+
+}
 // listeners

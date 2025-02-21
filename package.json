@@ -21,19 +21,28 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "electron-squirrel-startup": "^1.0.1",
     "unzipper": "^0.12.3"
   },
   "build": {
     "appId": "com.reizo.launcher",
     "productName": "Reizo Game Launcher",
-    "copyright": "2023 Reizo",
+    "copyright": "2025 Reizo",
     "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ],
     "win": {
-      "target": [
-        "portable"
-      ]
+      "target": "squirrel",
+      "icon": "img/installer.ico",
+      "artifactName": "REIZO_GAME_LAUNCHER.${ext}"
     },
-    "files": [
+    "squirrelWindows": {
+      "loadingGif": "img/installer_bg.png"
+    },
+		"afterPack": "scripts/cleanInstall.js",
+    "publish": null,
+		"files": [
       "**/*",
       "!build",
       "!dist",
