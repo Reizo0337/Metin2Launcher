@@ -38,7 +38,8 @@
       "artifactName": "REIZO_GAME_LAUNCHER.${ext}"
     },
     "squirrelWindows": {
-      "loadingGif": "img/installer_bg.png"
+      "loadingGif": "img/installer_bg.png",
+			"iconUrl": "http://localhost/patcher/icon/metin2.ico"
     },
 		"afterPack": "scripts/cleanInstall.js",
     "publish": null,

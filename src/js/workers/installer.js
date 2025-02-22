@@ -141,7 +141,7 @@ function fetchGame(unzipRoute) { // UPDATE 20/02/2025, fetching game in static r
 		route = DEFAULT_GAME_FOLDER
     console.log('Fetching game from server to route:', route);
     fileName = '/tempMetin2.zip'
-    const file = fs.createWriteStream(route+fileName)
+    const file = fs.createWriteStream(unzipRoute+fileName)
 
     const protocol = INSTALLER_URL.startsWith('https') ? https : http;
 

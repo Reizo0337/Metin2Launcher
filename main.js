@@ -8,14 +8,16 @@ const { SERVER_NAME, GAME_EXE_NAME, PATCHER_CONFIG_FILE } = require('./src/js/co
 const { loadConfig } = require('./src/js/workers/loadPatchConfig.js')
 const fs = require('fs')
 
+const squirrel = require('electron-squirrel-startup');
+
 let win
 let tray
 
 let isFirstInstalling = isFirstInstall()
 
-
-if (require('electron-squirrel-startup')) app.quit();
-
+if (squirrel) {
+  app.quit();
+}
 
 function createWindow () {
   if (isFirstInstalling) { 
@@ -82,25 +84,31 @@ function createWindow () {
 		})
 
 		win.webContents.on('did-finish-load', () => {
-			// Check if the necessary resources are ready
+			// In future..4now is just the necessary. Check if the necessary resources are ready 
 			// (For example, check if all images have been loaded)
-			if (isResourcesLoaded()) {
-        win.show();
-      } else {
-				// timeout for 10sec.
-				setTimeout(() => {
-					if (!isResourcesLoaded()) {
-						win.close()
-					}
-				}, 10000)
-			}
-      
-      // Once the resources are fully loaded, show the window
-      win.show();
+			win.show();
 		});
     
     win.loadFile('src/run.html')
   }
+
+	// prevent 2 same window..
+	app.on('second-instance', (event, commandLine, workingDirectory) => {
+		// Focus the main window or do something else
+		if (win) {
+			win.show()
+			win.focus()
+		}
+		event.preventDefault()
+	});
+
+	if (!app.requestSingleInstanceLock()) {
+		app.quit()
+	}
+	else{
+		app.on('ready', createWindow)
+	}
+
 
   win.on('close', (event) => {
     event.preventDefault()
@@ -311,8 +319,12 @@ function selectNewGamePath() {
 	}
 }
 
-function isResourcesLoaded(){
-	// load resources
-
+// check if app is already running
+function isAlreadyRunning() {
+	if (!app.requestSingleInstanceLock()) {
+		return true;
+	}
+	return false; 
 }
+
 // listeners
